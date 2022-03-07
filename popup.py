@@ -10,12 +10,6 @@ def live_talent(control, event):
     name_new_take(liveTalent)
     
 def camera_coverage(control, event):
-    #Change take for selected audio if camera coverage
-    for component in FBSystem().Scene.Components:
-        if (".wav") in component.LongName or (".mp3") in component.LongName:
-            if component.Selected == True:
-                print (component.LongName) 
-    component.CurrentTake = FBSystem().CurrentTake
     print control.Caption, " take has been created!"
     CloseTool(tool)
     liveTalent = False
@@ -25,21 +19,28 @@ def populate_layout(mainLyt):
     x = FBAddRegionParam(0,FBAttachType.kFBAttachLeft,"")
     y = FBAddRegionParam(0,FBAttachType.kFBAttachTop,"")
     w = FBAddRegionParam(0,FBAttachType.kFBAttachRight,"")
-    h = FBAddRegionParam(25,FBAttachType.kFBAttachNone,"")
+    h = FBAddRegionParam(100,FBAttachType.kFBAttachNone,"")
     mainLyt.AddRegion("main","main", x, y, w, h)
     lyt = FBHBoxLayout()
     mainLyt.SetControl("main",lyt)
     
-    b = FBButton()
-    b.Caption = "Live Talent"
-    b.Justify = FBTextJustify.kFBTextJustifyRight
-    lyt.Add(b,80)
-    b.OnClick.Add(live_talent)
+    l = FBLabel()
+    l.Caption = "If camera coverage, select audio tracks before clicking the button!"
+    l.Justify = FBTextJustify.kFBTextJustifyCenter
+    l.Style = FBTextStyle.kFBTextStyleBold
+    l.WordWrap = True
+    lyt.Add(l,150, space = 75)
+    
+    a = FBButton()
+    a.Caption = "Live Talent"
+    a.Justify = FBTextJustify.kFBTextJustifyRight
+    lyt.Add(a,80, height=50)
+    a.OnClick.Add(live_talent)
     
     b = FBButton()
     b.Caption = "Camera Coverage"
     b.Justify = FBTextJustify.kFBTextJustifyRight
-    lyt.Add(b,100)
+    lyt.Add(b,100, height=50)
     b.OnClick.Add(camera_coverage)
     
     #b = FBButton()
@@ -55,7 +56,7 @@ def create_tool():
     liveTalent = False
     global tool
     tool = FBCreateUniqueTool("Create New Take")
-    tool.StartSizeX = 300
+    tool.StartSizeX = 500
     tool.StartSizeY = 100
     populate_layout(tool)
     ShowTool(tool)
