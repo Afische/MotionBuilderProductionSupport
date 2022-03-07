@@ -32,6 +32,12 @@ def name_new_take(liveTalent):
     #If camera coverage, copy data
     else:
         newTake = FBSystem().CurrentTake.CopyTake(newName)
+        #Change take for selected audio if camera coverage
+        for component in FBSystem().Scene.Components:
+            if (".wav") in component.LongName or (".mp3") in component.LongName:
+                if component.Selected == True:
+                    component.CurrentTake = FBSystem().CurrentTake
+        
 
 #Find all input or output nodes in a constraint box
 def _find_animation_node(pParent, pName):
@@ -62,27 +68,31 @@ def connect_master_constraints():
     for constraint in constraints:
         if "Auto_RS_VCam_Target_Constraint_Logic" == constraint.Name:
             cameraConstraint = constraint
-
-    cameraBoxes = cameraConstraint.Boxes
-    for box in cameraBoxes:
-        if "Multiply (a x b)" == box.Name:
-            multiplyBox = box
-        elif "Auto_RS_VCam_Target" == box.Name:
-            receiverBox = box
-        elif "Camera" == box.Name:
-            senderBox = box
-        
-    multiplyNode = _find_animation_node(multiplyBox.AnimationNodeOutGet(), 'Result')
-    receiverFOVNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'FieldOfView')
-    senderRotationNode = _find_animation_node(senderBox.AnimationNodeOutGet(), 'Rotation')
-    receiverRotationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Rotation')
-    senderTranslationNode = _find_animation_node(senderBox.AnimationNodeOutGet(), 'Translation')
-    receiverTranslationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Translation')
-    FBConnect(multiplyNode, receiverFOVNode)
-    FBConnect(senderRotationNode, receiverRotationNode)
-    FBConnect(senderTranslationNode, receiverTranslationNode)
+    try:
+        cameraBoxes = cameraConstraint.Boxes
+        for box in cameraBoxes:
+            if "Multiply (a x b)" == box.Name:
+                multiplyBox = box
+            elif "Auto_RS_VCam_Target" == box.Name:
+                receiverBox = box
+            elif "Camera" == box.Name:
+                senderBox = box
+                
+        multiplyNode = _find_animation_node(multiplyBox.AnimationNodeOutGet(), 'Result')
+        receiverFOVNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'FieldOfView')
+        senderRotationNode = _find_animation_node(senderBox.AnimationNodeOutGet(), 'Rotation')
+        receiverRotationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Rotation')
+        senderTranslationNode = _find_animation_node(senderBox.AnimationNodeOutGet(), 'Translation')
+        receiverTranslationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Translation')
+        FBConnect(multiplyNode, receiverFOVNode)
+        FBConnect(senderRotationNode, receiverRotationNode)
+        FBConnect(senderTranslationNode, receiverTranslationNode)
+    
+    except:
+        print("Camera constraint Auto_RS_VCam_Target_Constraint_Logic not found")
     
     devices_online()
+    print("Devices online")
 
 #entry
 if __name__ == '__builtin__':
