@@ -10,6 +10,12 @@ def live_talent(control, event):
     name_new_take(liveTalent)
     
 def camera_coverage(control, event):
+    #Change take for selected audio if camera coverage
+    for component in FBSystem().Scene.Components:
+        if (".wav") in component.LongName or (".mp3") in component.LongName:
+            if component.Selected == True:
+                print (component.LongName) 
+    component.CurrentTake = FBSystem().CurrentTake
     print control.Caption, " take has been created!"
     CloseTool(tool)
     liveTalent = False
