@@ -1,2 +1,2 @@
 # MotionBuilderProductionSupport
-Menu bar tools to speed up virtual camrea production workflow in mobu
+Menu bar tools to speed up virtual camera production workflow in mobu
