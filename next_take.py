@@ -9,12 +9,12 @@ def devices_offline():
         for device in deviceList:
             if device.Name == "Vicon Stream Device":
                 device.Online = False
-                device.Live = True
-                device.RecordMode = True 
+                device.Live = False
+                device.RecordMode = False
             elif device.Name == "TP Vcam":
                 device.Online = True
                 device.Live = False
-                device.RecordMode = True
+                device.RecordMode = False
             else:
                 continue
     else:
@@ -26,17 +26,20 @@ def TPVCam_offline():
     if deviceList:
         for device in deviceList:
             if device.Name == "TP Vcam":
-                device.Live = True
-                device.RecordMode = True
                 device.Online = False
+                #device.Live = True
+                #device.RecordMode = True
     else:
         print ('No device found')
 
 def plot_camera():
 
+    for comp in FBSystem().Scene.Components:
+        comp.Selected = False
+
     constraints = FBSystem().Scene.Constraints
     for constraint in constraints:
-        if "Auto_RS_VCam_Target_Constraint_Logic" == constraint.Name:
+        if "MasterCam_Constraint_Logic" == constraint.Name:
             constraint.Selected = True
             
     for camera in FBSystem().Scene.Cameras:
@@ -66,20 +69,25 @@ def disconnect_master_constraints():
 
     constraints = FBSystem().Scene.Constraints
     for constraint in constraints:
-        if "Auto_RS_VCam_Target_Constraint_Logic" == constraint.Name:
+        if "MasterCam_Constraint_Logic" == constraint.Name:
             cameraConstraint = constraint
 
-    cameraBoxes = cameraConstraint.Boxes
-    for box in cameraBoxes:
-        if "Auto_RS_VCam_Target" == box.Name:
-            receiverBox = box
-        
-    receiverFOVNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'FieldOfView')
-    receiverRotationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Rotation')
-    receiverTranslationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Translation')
-    receiverFOVNode.DisconnectAllSrc()
-    receiverRotationNode.DisconnectAllSrc()
-    receiverTranslationNode.DisconnectAllSrc()
+    try:
+        cameraBoxes = cameraConstraint.Boxes
+        for box in cameraBoxes:
+            if "MasterCam" == box.Name:
+                receiverBox = box
+            
+        receiverFOVNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'FieldOfView')
+        receiverRotationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Rotation')
+        receiverTranslationNode = _find_animation_node(receiverBox.AnimationNodeInGet(), 'Translation')
+        receiverFOVNode.DisconnectAllSrc()
+        receiverRotationNode.DisconnectAllSrc()
+        receiverTranslationNode.DisconnectAllSrc()
+        print("MasterCam constraint disconnected")
+    
+    except:
+        print("MasterCam constraint not found")
     
     TPVCam_offline()
 
