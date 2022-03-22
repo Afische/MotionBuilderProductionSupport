@@ -66,14 +66,14 @@ def connect_master_constraints():
 
     constraints = FBSystem().Scene.Constraints
     for constraint in constraints:
-        if "Auto_RS_VCam_Target_Constraint_Logic" == constraint.Name:
+        if "MasterCam_Constraint_Logic" == constraint.Name:
             cameraConstraint = constraint
     try:
         cameraBoxes = cameraConstraint.Boxes
         for box in cameraBoxes:
             if "Multiply (a x b)" == box.Name:
                 multiplyBox = box
-            elif "Auto_RS_VCam_Target" == box.Name:
+            elif "MasterCam" == box.Name:
                 receiverBox = box
             elif "Camera" == box.Name:
                 senderBox = box
@@ -87,9 +87,10 @@ def connect_master_constraints():
         FBConnect(multiplyNode, receiverFOVNode)
         FBConnect(senderRotationNode, receiverRotationNode)
         FBConnect(senderTranslationNode, receiverTranslationNode)
+        print("MasterCam constraint connected")
     
     except:
-        print("Camera constraint Auto_RS_VCam_Target_Constraint_Logic not found")
+        print("MasterCam constraint not found")
     
     devices_online()
     print("Devices online")
